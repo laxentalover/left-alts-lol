@@ -172,55 +172,29 @@ function displayStats() {
     const uptime = Math.floor((Date.now() - stats.uptime) / 1000);
     const uptimeStr = `${Math.floor(uptime / 60)}m ${uptime % 60}s`;
     
-    const statsBox = new Table({
-        chars: {
-            'top': '━',
-            'top-mid': '┳',
-            'top-left': '┏',
-            'top-right': '┓',
-            'bottom': '━',
-            'bottom-mid': '┻',
-            'bottom-left': '┗',
-            'bottom-right': '┛',
-            'left': '┃',
-            'left-mid': '┣',
-            'mid': '━',
-            'mid-mid': '╋',
-            'right': '┃',
-            'right-mid': '┫',
-            'middle': '┃'
-        },
-        style: {
-            head: ['cyan'],
-            border: ['gray']
-        },
-        colWidths: [15, 8, 15, 8]
-    });
+    const statsBox = boxen(
+        chalk.white(`
+${chalk.yellow('📊 LIVE STATISTICS')}
 
-    const title = chalk.bold.cyan('Stats ') + chalk.gray(`(${uptimeStr})`);
-
-    statsBox.push(
-        [
-            chalk.green('✓ Joined'), stats.joined,
-            chalk.red('✗ Failed'), stats.failed
-        ],
-        [
-            chalk.blue('→ Sent'), stats.sent,
-            chalk.red('⊘ Kicked'), stats.kicked
-        ],
-        [
-            chalk.cyan('⟳ Reconnect'), stats.reconnects,
-            chalk.magenta('⚡ Commands'), stats.commandsExecuted
-        ],
-        [
-            chalk.yellow('⌚ Timeout'), stats.timeout,
-            chalk.blue('✉ Messages'), stats.messagesSent
-        ]
+${chalk.green('✅ Joined:')} ${chalk.bold(stats.joined.toString().padEnd(5))} ${chalk.gray('│')} ${chalk.red('❌ Failed:')} ${chalk.bold(stats.failed.toString().padEnd(5))}
+${chalk.blue('📤 Sent:')} ${chalk.bold(stats.sent.toString().padEnd(5))} ${chalk.gray('│')} ${chalk.red('🚫 Kicked:')} ${chalk.bold(stats.kicked.toString().padEnd(5))}
+${chalk.yellow('⏱  Timeout:')} ${chalk.bold(stats.timeout.toString().padEnd(5))} ${chalk.gray('│')} ${chalk.magenta('🌐 Proxies:')} ${chalk.bold(stats.proxiesWorking + '/' + stats.proxiesFound)}
+${chalk.cyan('⟲ Reconnect:')} ${chalk.bold(stats.reconnects.toString().padEnd(5))} ${chalk.gray('│')} ${chalk.blue('✉ Messages:')} ${chalk.bold(stats.messagesSent)}
+${chalk.white('⏰ Uptime:')} ${chalk.bold(uptimeStr)}
+        `.trim()),
+        {
+            padding: 1,
+            margin: 1,
+            borderStyle: 'round',
+            borderColor: 'cyan',
+            backgroundColor: '#1a1a1a',
+            float: 'center'
+        }
     );
 
-    // Clear previous stats and draw new ones
+    // Move cursor and print stats
     process.stdout.write('\x1B[1G\x1B[2K'); // Clear line and move cursor to start
-    process.stdout.write('\x1B[12;0H' + title + '\n' + statsBox.toString());
+    process.stdout.write('\x1B[12;0H' + statsBox);
 }
 
 // Fetch proxies with progress
